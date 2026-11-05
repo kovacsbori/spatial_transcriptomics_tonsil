@@ -1,0 +1,42 @@
+# Presentation theme: modern dark.
+# Near-black background, slightly lighter panels, one lavender accent (#D8ACEE), a deeper sidebar.
+[theme]
+base = "dark"
+primaryColor = "#D8ACEE"
+backgroundColor = "#0B0F17"
+secondaryBackgroundColor = "#151B26"
+codeBackgroundColor = "#151B26"
+textColor = "#E6EAF2"
+linkColor = "#D8ACEE"
+borderColor = "#252D3B"
+showWidgetBorder = false
+showSidebarBorder = false
+baseRadius = "12px"
+buttonRadius = "10px"
+
+# Body: Carlito (free, metric-compatible Calibri). Headings: Figtree Bold (close to Aptos Display Bold).
+# If Calibri / Aptos Display are installed on the presenting computer, they are used first.
+font = "Calibri, Carlito:https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&display=swap, sans-serif"
+headingFont = "'Aptos Display', Figtree:https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800&display=swap, sans-serif"
+baseFontSize = 17
+headingFontSizes = ["46px", "30px", "24px", "19px", "17px", "15px"]
+headingFontWeights = [700, 700, 700, 700, 600, 600]
+metricValueFontSize = "30px"
+metricValueFontWeight = 600
+linkUnderline = false
+
+# Semantic colours (info boxes, badges, alerts) tuned to the dark palette
+blueColor = "#C99BE3"
+violetColor = "#D8ACEE"
+greenColor = "#34D399"
+yellowColor = "#FBBF24"
+orangeColor = "#FB923C"
+redColor = "#F87171"
+
+dataframeHeaderBackgroundColor = "#1C2331"
+dataframeBorderColor = "#252D3B"
+
+[theme.sidebar]
+backgroundColor = "#070A10"
+secondaryBackgroundColor = "#111622"
+borderColor = "#1C2331"

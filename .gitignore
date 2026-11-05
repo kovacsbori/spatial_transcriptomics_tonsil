@@ -1,0 +1,23 @@
+# Python environment and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Data: large, downloaded with `python download_data.py`
+data/
+
+# Generated output
+results/
+
+# Personal presenter notes (not part of the project)
+PRESENTER_NOTES.md
+
+# Streamlit secrets (config.toml with the theme IS committed)
+.streamlit/secrets.toml
+
+# OS / editor clutter
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/
