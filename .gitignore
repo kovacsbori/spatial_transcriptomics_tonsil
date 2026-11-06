@@ -12,6 +12,7 @@ results/
 
 # Personal presenter notes (not part of the project)
 PRESENTER_NOTES.md
+PRESENTER_NOTES.pdf
 
 # Streamlit secrets (config.toml with the theme IS committed)
 .streamlit/secrets.toml

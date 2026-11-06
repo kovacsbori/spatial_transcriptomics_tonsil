@@ -19,11 +19,15 @@ buttonRadius = "10px"
 font = "Calibri, Carlito:https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&display=swap, sans-serif"
 headingFont = "'Aptos Display', Figtree:https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800&display=swap, sans-serif"
 baseFontSize = 17
-headingFontSizes = ["46px", "30px", "24px", "19px", "17px", "15px"]
+headingFontSizes = ["38px", "26px", "21px", "18px", "16px", "14px"]
 headingFontWeights = [700, 700, 700, 700, 600, 600]
 metricValueFontSize = "30px"
 metricValueFontWeight = 600
 linkUnderline = false
+
+# Tighter page padding so each slide fits on one screen
+paddingTop = "1.5rem"
+paddingBottom = "1rem"
 
 # Semantic colours (info boxes, badges, alerts) tuned to the dark palette
 blueColor = "#C99BE3"

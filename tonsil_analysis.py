@@ -48,9 +48,10 @@ SEED = 0
 # fewer cells per spot), not a technical failure.
 QC_MIN_COUNTS, QC_MIN_GENES = 500, 250
 
-# Leiden "resolution": higher = more, smaller clusters. 0.6 gives 8 clusters that map cleanly onto the
-# known tonsil compartments.
-LEIDEN_RESOLUTION = 0.6
+# Leiden "resolution": higher = more, smaller clusters. 0.3 gives 6 clusters (one per named tissue part).
+# Note: at 0.6 (8 clusters) the compartments separate more cleanly; at 6 the T-cell zone and its stroma
+# stay together and plasma cells mix with epithelium.
+LEIDEN_RESOLUTION = 0.3
 
 # Known tonsil programs (textbook marker genes) used to give clusters a name. Each list should contain genes
 # that are specifically high in that compartment. Sources: tonsil atlas (Massoni-Badosa et al. 2024) and

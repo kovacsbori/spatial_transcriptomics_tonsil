@@ -15,12 +15,19 @@ REGION_COLORS = {
     "B follicle (mantle)": "#4C78A8",
     "Germinal center": "#E45756",
     "T-cell zone": "#54A24B",
-    "Plasma cells": "#B279A2",
+    "Plasma cells": "#17BECF",
     "Squamous epithelium": "#F2B701",
     "Stroma / vessels": "#9D755D",
 }
 # Palette for numbered clusters (the clustering slide can produce up to ~18 clusters).
-CLUSTER_PALETTE = px.colors.qualitative.Dark24
+# No purples, magentas or pinks anywhere in the spot colours: the H&E background is pink/purple.
+CLUSTER_PALETTE = [
+    "#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#17BECF", "#BCBD22", "#8C564B", "#F2B701",
+    "#00A08B", "#2E91E5", "#B68100", "#6C7C32", "#EB663B", "#7F7F7F", "#0D2A63", "#66C2A5",
+    "#A6761D", "#1CA71C", "#FFD92F", "#222A2A",
+]
+# Continuous colour scale for gene/protein/RNA-amount maps: dark blue -> yellow, no purple (unlike viridis/magma).
+VALUE_CMAP = "Cividis"
 
 
 # ------------------------------------------------------------------------------------------- data access
@@ -137,7 +144,7 @@ def add_region_traces(fig, highlight=None):
     return add_category_traces(fig, R["xy"][:, 0], R["xy"][:, 1], regions, REGION_COLORS, highlight)
 
 
-def add_value_trace(fig, values, label, cmap="Viridis", x=None, y=None, hover_extra=None):
+def add_value_trace(fig, values, label, cmap=VALUE_CMAP, x=None, y=None, hover_extra=None):
     """Spots coloured by a continuous value (gene expression, score, protein …) with a colour bar.
 
     The colour range is clipped to the 1st–99th percentile so a few extreme spots don't wash out the map.
@@ -197,9 +204,10 @@ def what_you_see(text):
 
 
 def how_it_works(steps):
-    """Optional technical detail, collapsed by default so the page stays simple."""
-    with st.expander("How it works (optional detail)", icon=":material/settings:"):
-        st.markdown("\n".join(f"{i}. {s}" for i, s in enumerate(steps, 1)))
+    """Always-visible, compact note on the method behind the slide (shown in a side column)."""
+    with st.container(border=True):
+        st.markdown("**:material/settings: How it works**")
+        st.caption("\n".join(f"- {s}" for s in steps))
 
 
 def references(*keys):
