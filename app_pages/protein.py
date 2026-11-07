@@ -13,16 +13,28 @@ PAIRS = {
     "CD68 (macrophages)": ("CD68", "CD68"),
 }
 
+@st.dialog("RNA–protein agreement for all markers", width="large")
+def agreement_dialog():
+    """Large pop-up with the RNA–protein agreement for every antibody."""
+    cfig = px.bar(R["rna_prot"].sort_values("rho"), x="rho", y="protein", orientation="h",
+                  labels={"rho": "agreement (Spearman correlation)", "protein": ""})
+    cfig.update_layout(height=640, margin=dict(l=0, r=0, t=10, b=0))
+    st.plotly_chart(cfig, alt="Agreement between RNA and protein for every marker")
+
+
 question("Genes are the recipe, proteins are the dish. Do they show the same picture?")
 what_you_see(
     "Same tissue, two measurements: the **gene (RNA)** on the left, the **protein** (measured with antibodies) in "
     "the middle. Pick a marker and compare the two maps."
 )
 
-c1, c2, c3 = st.columns([1, 1, 0.75])
+# Full-width selector above the maps (it wraps onto several lines in the narrow side column)
+choice = st.segmented_control("Marker", list(PAIRS), default="PAX5 (B cells)", required=True,
+                              label_visibility="collapsed")
+p, g = PAIRS[choice]
+
+c1, c2, c3 = st.columns([1, 1, 0.8], gap="medium")
 with c3:
-    choice = st.segmented_control("Marker", list(PAIRS), default="PAX5 (B cells)", required=True)
-    p, g = PAIRS[choice]
     rho = rp.loc[p, "rho"]
     verdict = "strong" if rho >= 0.6 else "moderate" if rho >= 0.4 else "weak"
     st.metric("Agreement (0 = none, 1 = perfect)", f"{rho:.2f} · {verdict}", border=True)
@@ -32,19 +44,14 @@ with c3:
         "antibody's own background level.",
         "Agreement = Spearman correlation between RNA and protein across all spots.",
     ])
-    with st.popover("Agreement for all markers", icon=":material/bar_chart:", width="stretch"):
-        cfig = px.bar(R["rna_prot"].sort_values("rho"), x="rho", y="protein", orientation="h",
-                      labels={"rho": "agreement (Spearman correlation)", "protein": ""})
-        cfig.update_layout(height=560, margin=dict(l=0, r=0, t=10, b=0))
-        st.plotly_chart(cfig, alt="Agreement between RNA and protein for every marker")
+    if st.button("Agreement for all markers", icon=":material/bar_chart:", width="stretch"):
+        agreement_dialog()
 
 with c1:
-    f1 = tissue_fig(height=470)
+    f1 = tissue_fig(height=430, title=f"Gene (RNA): {g}")
     add_value_trace(f1, gene_values(g), g)
-    f1.update_layout(title=f"Gene (RNA): {g}")
     st.plotly_chart(f1, alt=f"Tissue map of {g} RNA")
 with c2:
-    f2 = tissue_fig(height=470)
+    f2 = tissue_fig(height=430, title=f"Protein: {p}")
     add_value_trace(f2, R["prot"][p].values, p)
-    f2.update_layout(title=f"Protein: {p}")
     st.plotly_chart(f2, alt=f"Tissue map of {p} protein")

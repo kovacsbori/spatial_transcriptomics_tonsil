@@ -18,6 +18,19 @@ st.set_page_config(
     layout="wide",
 )
 
+# Slide chrome: the default Streamlit header and page padding take ~90 px at the top and ~85 px per side.
+# Shrink them so each slide fits on one screen. The header stays (it holds the sidebar toggle) but becomes a
+# transparent overlay that only catches clicks on its own buttons, so the title row underneath stays clickable.
+st.html("""<style>
+[data-testid="stMainBlockContainer"] { padding: 1.1rem 2.25rem 0.75rem; }
+[data-testid="stHeader"] { background: transparent; pointer-events: none; height: 2.5rem; }
+[data-testid="stHeader"] button, [data-testid="stHeader"] a { pointer-events: auto; }
+[data-testid="stMainBlockContainer"] h1 { padding: 0; }
+[data-testid="stMainBlockContainer"] h3 { padding: 0 0 0.15rem; }
+/* Pills / segmented controls wrap onto a second line in narrow columns instead of being cut off */
+[data-testid="stButtonGroup"] > div:last-child { flex-wrap: wrap; row-gap: 0.4rem; }
+</style>""")
+
 # Slide order, grouped into sidebar sections. Each st.Page points to one file in app_pages/.
 # To add, remove or reorder slides, edit this dictionary only.
 SECTIONS = {
@@ -86,30 +99,20 @@ with st.sidebar:
 # Position of the current slide in the presentation (0-based).
 idx = next(i for i, p in enumerate(ALL_PAGES) if p.url_path == page.url_path)
 
-# Slide header: title + thin progress bar
+# Slide header: thin progress bar, then the title with Back / Next on the right.
+# Hovering a button shows the title of the slide it leads to.
 st.progress((idx + 1) / len(ALL_PAGES))
-st.title(page.title)
+with st.container(horizontal=True, horizontal_alignment="distribute", vertical_alignment="center"):
+    st.title(page.title, anchor=False, width="content")
+    with st.container(horizontal=True, width="content", gap="small"):
+        if idx > 0 and st.button("Back", icon=":material/arrow_back:", help=ALL_PAGES[idx - 1].title):
+            st.switch_page(ALL_PAGES[idx - 1])
+        if idx < len(ALL_PAGES) - 1 and st.button(
+            "Next", icon=":material/arrow_forward:", icon_position="right", type="primary",
+            help=ALL_PAGES[idx + 1].title,
+        ):
+            st.switch_page(ALL_PAGES[idx + 1])
 
 # Run the analysis (first visit only, ~25 s; cached afterwards), then draw the current slide's content.
 results()
 page.run()
-
-# Back / Next buttons at the bottom of every slide. "distribute" pushes them to opposite sides.
-# Hovering a button shows the title of the slide it leads to.
-st.space("medium")
-with st.container(horizontal=True, horizontal_alignment="distribute"):
-    if idx > 0:
-        if st.button(
-            "Back", icon=":material/arrow_back:", help=ALL_PAGES[idx - 1].title
-        ):
-            st.switch_page(ALL_PAGES[idx - 1])
-    else:
-        st.empty()  # placeholder on the first slide so "Next" still sits on the right
-    if idx < len(ALL_PAGES) - 1:
-        if st.button(
-            "Next",
-            icon=":material/arrow_forward:",
-            icon_position="right",
-            help=ALL_PAGES[idx + 1].title,
-        ):
-            st.switch_page(ALL_PAGES[idx + 1])

@@ -83,15 +83,31 @@ def display_opts():
 
 
 # ------------------------------------------------------------------------------------------- figures
-def tissue_fig(height=600, crop=None, force_image=False):
+def spot_bbox(pad=30):
+    """Crop window (x0, x1, y0, y1) around all measured spots.
+
+    The capture area covers only part of the H&E image (a third of the tissue on the right has no spots), so
+    data maps zoom to this window: the spots fill the plot instead of sitting small in a mostly empty frame.
+    """
+    R = results()
+    qc = R["qc_all"]   # all spots before QC, so spots removed on the QC slide are inside the window too
+    h, w = R["image"].shape[:2]
+    return (max(0, qc["x"].min() - pad), min(w, qc["x"].max() + pad),
+            max(0, qc["y"].min() - pad), min(h, qc["y"].max() + pad))
+
+
+def tissue_fig(height=600, crop=None, force_image=False, full_image=False, title=None):
     """Empty Plotly figure set up as a tissue map: H&E image in the background, axes in hires-image pixels.
 
+    By default the view is cropped to the measured spots (spot_bbox); full_image=True shows the whole section.
     crop = (x0, x1, y0, y1) shows only part of the image (used for zoomed views).
     force_image=True shows the H&E even if the sidebar toggle is off (for slides that are about the image).
     Spots are added on top with the add_*_trace helpers below.
     """
     R = results()
     _, _, show_he = display_opts()
+    if crop is None and not full_image:
+        crop = spot_bbox()
     if show_he or force_image:
         img = R["image"]
         x0 = y0 = 0
@@ -107,11 +123,15 @@ def tissue_fig(height=600, crop=None, force_image=False):
         fig = go.Figure()
         # Image convention: y grows downwards; keep x and y on the same scale so the tissue isn't stretched.
         fig.update_yaxes(autorange="reversed", scaleanchor="x")
+        if crop:
+            fig.update_xaxes(range=[crop[0], crop[1]])
+            fig.update_yaxes(range=[crop[3], crop[2]], autorange=False)   # reversed: y grows downwards
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)
-    # Transparent background so the plot blends into the dark theme.
-    fig.update_layout(height=height, margin=dict(l=0, r=0, t=30, b=0), legend=dict(itemsizing="constant"),
-                      plot_bgcolor="rgba(0,0,0,0)")
+    # Transparent background so the plot blends into the dark theme. Room at the top only if there is a title.
+    fig.update_layout(height=height, margin=dict(l=0, r=0, t=30 if title else 4, b=0),
+                      legend=dict(itemsizing="constant"), plot_bgcolor="rgba(0,0,0,0)",
+                      title=dict(text=title, font=dict(size=16)) if title else None)
     return fig
 
 
@@ -160,9 +180,13 @@ def add_value_trace(fig, values, label, cmap=VALUE_CMAP, x=None, y=None, hover_e
         marker=dict(size=spot_size, color=values, colorscale=cmap, opacity=opacity,
                     # tiny epsilon keeps cmax > cmin even for a gene that is constant across spots
                     cmin=np.percentile(values, 1), cmax=max(np.percentile(values, 99), np.percentile(values, 1) + 1e-6),
-                    colorbar=dict(title=label, thickness=12)),
+                    # Horizontal colour bar under the map: a vertical one would take width away from the
+                    # (square) tissue map and shrink it
+                    colorbar=dict(title=dict(text=label, side="top"), orientation="h", thickness=10, len=0.8,
+                                  x=0.5, xanchor="center", y=-0.02, yanchor="top")),
         customdata=np.stack([hover, np.round(values, 2)], axis=1),
         hovertemplate="%{customdata[0]}<br>" + label + ": %{customdata[1]}<extra></extra>"))
+    fig.update_layout(margin_b=60)   # room for the colour bar
     return fig
 
 
@@ -210,10 +234,16 @@ def how_it_works(steps):
         st.caption("\n".join(f"- {s}" for s in steps))
 
 
-def references(*keys):
-    """Short list of key references (used on the final slide). Keys refer to tonsil_refs.REFS."""
+def references(*keys, columns=1):
+    """Short list of key references (used on the final slide). Keys refer to tonsil_refs.REFS.
+
+    columns > 1 spreads the list over side-by-side columns (for a full-width strip at the bottom of a slide).
+    """
     from tonsil_refs import REFS
     with st.container(border=True):
         st.markdown("**:material/menu_book: Key references**")
-        st.caption("  \n".join(f"**{REFS[k][0]}**: {REFS[k][1]}. [{REFS[k][2].replace('https://', '')}]({REFS[k][2]})"
-                                for k in keys))
+        cols = st.columns(columns, gap="medium")
+        for i, k in enumerate(keys):
+            author, text, url = REFS[k]
+            with cols[i % columns]:
+                st.caption(f"**{author}**: {text}. [{url.replace('https://', '')}]({url})")

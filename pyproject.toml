@@ -1,0 +1,27 @@
+[project]
+name = "spatial-transcriptomics-tonsil"
+version = "0.1.0"
+requires-python = "==3.12.*"
+dependencies = [
+    "anndata==0.12.2",
+    "dask-image==2024.5.3",
+    "igraph==0.11.9",
+    "numba==0.61.2",
+    "numpy==2.2.6",
+    "pandas==2.3.2",
+    "plotly==6.3.0",
+    "pynndescent==0.5.13",
+    "scanpy==1.11.4",
+    "scikit-learn==1.7.2",
+    "scikit-misc==0.5.1",
+    "scipy==1.16.1",
+    "setuptools==80.9.0",
+    "squidpy==1.6.5",
+    "streamlit==1.66.1",
+    "umap-learn==0.5.9.post2",
+    "xarray==2025.9.0",
+]
+
+[tool.uv]
+# Keep the cross-platform resolver from backtracking to ancient, unbuildable s3fs releases
+constraint-dependencies = ["s3fs>=2024.1.0"]

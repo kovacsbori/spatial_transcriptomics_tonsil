@@ -17,9 +17,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh      # macOS / Linux
 #   or: brew install uv                               # macOS with Homebrew
 #   or (Windows PowerShell): powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# 2. Create an environment and install dependencies
-uv venv --python 3.12 .venv
-uv pip install --python .venv -r requirements.txt
+# 2. Create the environment and install the locked dependencies (pyproject.toml + uv.lock)
+uv sync
 #   (without uv: python3.12 -m venv .venv && .venv/bin/pip install -r requirements.txt)
 
 # 3. Download the dataset (~70 MB) into data/Human_Tonsil_FFPE/

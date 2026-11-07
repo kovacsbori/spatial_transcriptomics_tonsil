@@ -7,7 +7,7 @@ R = results()
 
 question("Which genes are switched on, and *where* in the tissue?")
 
-c1, c2, c3 = st.columns([0.9, 1.25, 1])
+c1, c2, c3 = st.columns([1, 1.15, 1.05], gap="medium")
 with c1:
     # Three ways to study a fruit tart, as compact rows
     for icon, name, text in [
@@ -24,18 +24,19 @@ with c1:
     ])
 with c2:
     show_spots = st.toggle("Show the measurement spots", value=True)
-    fig = tissue_fig(height=450, force_image=True)
+    fig = tissue_fig(height=400, force_image=True, full_image=True)
     if show_spots:
         fig.add_trace(go.Scattergl(x=R["xy"][:, 0], y=R["xy"][:, 1], mode="markers", hoverinfo="skip",
                                    marker=dict(size=4, color="rgba(30,30,30,0.45)"), showlegend=False))
     st.plotly_chart(fig, alt="Stained image of the tonsil slice with measurement spots")
 with c3:
     zoom = st.segmented_control("Zoom in on", ["Germinal center", "T-cell zone", "Squamous epithelium"],
-                                default="Germinal center", required=True, label_visibility="collapsed")
+                                default="Germinal center", required=True, label_visibility="collapsed",
+                                format_func=lambda r: {"Germinal center": "Germ. center", "Squamous epithelium": "Epithelium"}.get(r, r))
     crop = region_crop(zoom, half_width=110)
-    zfig = tissue_fig(height=380, crop=crop, force_image=True)
+    zfig = tissue_fig(height=330, crop=crop, force_image=True)
     m = in_crop(crop)
-    px_per_unit = 360 / (crop[1] - crop[0])
+    px_per_unit = (330 - 4) / (crop[1] - crop[0])   # square crop: plot height (minus top margin) in screen px
     zfig.add_trace(go.Scatter(x=R["xy"][m, 0], y=R["xy"][m, 1], mode="markers", hoverinfo="skip", showlegend=False,
                               marker=dict(size=R["spot_diameter_px"] * px_per_unit, symbol="circle-open",
                                           line=dict(width=2, color=REGION_COLORS[zoom]))))

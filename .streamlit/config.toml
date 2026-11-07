@@ -19,15 +19,11 @@ buttonRadius = "10px"
 font = "Calibri, Carlito:https://fonts.googleapis.com/css2?family=Carlito:wght@400;700&display=swap, sans-serif"
 headingFont = "'Aptos Display', Figtree:https://fonts.googleapis.com/css2?family=Figtree:wght@600;700;800&display=swap, sans-serif"
 baseFontSize = 17
-headingFontSizes = ["38px", "26px", "21px", "18px", "16px", "14px"]
+headingFontSizes = ["30px", "24px", "20px", "18px", "16px", "14px"]
 headingFontWeights = [700, 700, 700, 700, 600, 600]
 metricValueFontSize = "30px"
 metricValueFontWeight = 600
 linkUnderline = false
-
-# Tighter page padding so each slide fits on one screen
-paddingTop = "1.5rem"
-paddingBottom = "1rem"
 
 # Semantic colours (info boxes, badges, alerts) tuned to the dark palette
 blueColor = "#C99BE3"
@@ -44,3 +40,7 @@ dataframeBorderColor = "#252D3B"
 backgroundColor = "#070A10"
 secondaryBackgroundColor = "#111622"
 borderColor = "#1C2331"
+
+# Hide the "Deploy" button and developer menu items, which would overlap the slide header
+[client]
+toolbarMode = "minimal"

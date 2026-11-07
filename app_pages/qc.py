@@ -18,7 +18,7 @@ adata = R["adata"]
 
 question("Can we trust every spot, and can we compare spots fairly?")
 
-c1, c2, c3 = st.columns([1, 1, 0.75])
+c1, c2, c3 = st.columns([1, 1, 0.8], gap="medium")
 
 # ------------------------------------------------------------------------------------- part 1: remove bad spots
 with c1:
@@ -35,7 +35,7 @@ with c1:
         label_visibility="collapsed",
     )
     fail = (qc["total_counts"] < min_counts).values
-    fig = tissue_fig(height=400)
+    fig = tissue_fig(height=420)
     # Cividis has no red (or purple) in it, so the red "removed" crosses stay easy to see
     add_value_trace(
         fig,
@@ -61,7 +61,8 @@ with c1:
                 ),
             )
         )
-    fig.update_layout(legend=dict(x=0, y=1))
+    # Legend above the map, so the "removed" key doesn't cover the tissue
+    fig.update_layout(legend=dict(orientation="h", x=0, y=1, yanchor="bottom"), margin_t=26)
     st.plotly_chart(
         fig, alt="Tissue map of RNA amount per spot with removed spots as red crosses"
     )
@@ -87,7 +88,7 @@ with c2:
         required=True,
         label_visibility="collapsed",
     )
-    fig = tissue_fig(height=400)
+    fig = tissue_fig(height=420)
     add_value_trace(fig, raw if scale == "Before adjustment" else norm, gene)
     st.plotly_chart(fig, alt=f"Tissue map of {gene} {scale.lower()}")
     rho = rho_raw if scale == "Before adjustment" else rho_norm
@@ -105,16 +106,10 @@ with c3:
         [
             f"QC: spots with < {QC_MIN_COUNTS} UMIs or < 250 genes, and genes in < 10 spots, are removed. Thresholds "
             "are mild because low RNA is often biology (fewer cells), not failure.",
-            "These cut-offs (like the 10,000 below) are common conventions, not fixed rules; they are chosen per "
+            "These cut-offs are common conventions, not fixed rules; they are chosen per "
             "dataset. Here QC removes 3 spots and 55 near-empty genes.",
             "Normalisation: spots capture different total amounts of RNA, so raw counts mix biology with "
             "capture efficiency; without it, spots can't be compared fairly "
             "([more](https://www.sc-best-practices.org/preprocessing_visualization/normalization.html)).",
         ]
     )
-    if min_counts > 10000:
-        st.warning(
-            "Whole regions disappear: some tissue simply contains less RNA. A cut-off this strict "
-            "would delete real biology.",
-            icon=":material/warning:",
-        )

@@ -17,6 +17,18 @@ DESCRIPTIONS = {
     "Stroma / vessels": "Connective tissue and blood vessels that hold everything together.",
 }
 
+@st.dialog("Scores and marker genes per group", width="large")
+def scores_dialog():
+    """Large pop-up with the per-group marker scores and each group's own top marker genes."""
+    hfig = px.imshow(R["cluster_z"].round(1), text_auto=True, color_continuous_scale="RdBu_r", zmin=-2, zmax=2,
+                     aspect="auto", labels=dict(x="", y="group", color="score"))
+    hfig.update_traces(textfont_size=14)
+    hfig.update_layout(height=420, margin=dict(l=0, r=0, t=10, b=0))
+    st.plotly_chart(hfig, alt="Heatmap of marker score per group")
+    st.dataframe(R["markers"].rename(columns=lambda c: f"group {c}"), hide_index=True,
+                 alt="Top marker genes for each group")
+
+
 question("The groups are just numbers. Which part of the tonsil is each one?")
 what_you_see(
     "**Left:** pick a tissue part; red spots are where its **textbook marker genes** are switched on. "
@@ -24,23 +36,19 @@ what_you_see(
 )
 sig = st.segmented_control("Tissue part", list(SIGNATURES), default="Germinal center", required=True,
                            label_visibility="collapsed")
+st.caption(f"**{sig}**: {DESCRIPTIONS[sig]} Markers: " + ", ".join(f"*{g}*" for g in SIGNATURES[sig]))
 
-c1, c2, c3 = st.columns([1, 1, 0.75])
+c1, c2, c3 = st.columns([1, 1, 0.8], gap="medium")
 with c1:
-    fig = tissue_fig(height=430)
+    fig = tissue_fig(height=440, title=f"Marker score: {sig}")
     add_value_trace(fig, obs[sig].values, "marker score", cmap="RdBu_r")
-    fig.update_layout(title=f"Marker score: {sig}")
     st.plotly_chart(fig, alt=f"Tissue map of the {sig} marker score")
 with c2:
-    fig = tissue_fig(height=430)
+    fig = tissue_fig(height=440, title="Result: named regions")
     add_region_traces(fig)
-    fig.update_layout(title="Result: named regions", legend=dict(orientation="h", y=-0.02))
+    fig.update_layout(legend=dict(orientation="h", y=-0.02))
     st.plotly_chart(fig, alt="Tissue map coloured by named region")
 with c3:
-    with st.container(border=True):
-        st.markdown(f"**{sig}**")
-        st.caption(DESCRIPTIONS[sig])
-        st.caption("Markers: " + ", ".join(f"*{g}*" for g in SIGNATURES[sig]))
     how_it_works([
         "Gene-set scoring ([Tirosh et al. 2016](https://doi.org/10.1126/science.aad0501); "
         "[`score_genes`](https://scanpy.readthedocs.io/en/stable/generated/scanpy.tl.score_genes.html)): mean "
@@ -51,10 +59,5 @@ with c3:
         "must agree with its name ([more on annotation](https://www.sc-best-practices.org/cellular_structure/"
         "annotation.html)).",
     ])
-    with st.popover("Scores and marker genes per group", icon=":material/table:", width="stretch"):
-        hfig = px.imshow(R["cluster_z"].round(1), text_auto=True, color_continuous_scale="RdBu_r", zmin=-2, zmax=2,
-                         aspect="auto", labels=dict(x="", y="group", color="score"))
-        hfig.update_layout(height=340, margin=dict(l=0, r=0, t=10, b=0))
-        st.plotly_chart(hfig, alt="Heatmap of marker score per group")
-        st.dataframe(R["markers"].rename(columns=lambda c: f"group {c}"), hide_index=True,
-                     alt="Top marker genes for each group")
+    if st.button("Scores and marker genes per group", icon=":material/table:", width="stretch"):
+        scores_dialog()

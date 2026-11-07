@@ -22,7 +22,7 @@ what_you_see(
     "**Right:** the same spots on the tissue. The computer **never saw the positions**."
 )
 
-c1, c2, c3 = st.columns([1, 1, 0.75])
+c1, c2, c3 = st.columns([1, 1, 0.8], gap="medium")
 with c3:
     res = st.select_slider(
         "Level of detail",
@@ -59,7 +59,7 @@ with c1:
         ufig, umap[:, 0], umap[:, 1], labels, colors, size=4, name_prefix="group "
     )
     ufig.update_layout(
-        height=470,
+        height=450,
         margin=dict(l=0, r=0, t=30, b=0),
         title="Similarity map (UMAP)",
         xaxis=dict(visible=False),
@@ -69,9 +69,9 @@ with c1:
     )
     st.plotly_chart(ufig, alt="Similarity map of spots coloured by group")
 with c2:
-    tfig = tissue_fig(height=470)
+    tfig = tissue_fig(height=450, title="Same groups on the tissue")
     add_category_traces(
         tfig, R["xy"][:, 0], R["xy"][:, 1], labels, colors, name_prefix="group "
     )
-    tfig.update_layout(title="Same groups on the tissue", showlegend=False)
+    tfig.update_layout(showlegend=False)
     st.plotly_chart(tfig, alt="Tissue map coloured by group")
